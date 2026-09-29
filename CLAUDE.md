@@ -4,19 +4,27 @@
 
 ## プロジェクト概要
 
-家計簿アプリ（kakeibo-app）。収入・支出を記録し、集計・可視化するためのアプリケーション。
+レシート読み込み家計簿Webアプリ（kakeibo-app）。レシート画像をアップロードすると Claude API で商品名・金額・日付を読み取り、カテゴリ別・月別に集計してグラフ表示する。
 
-<!-- 技術スタックが決まったら追記してください -->
-- 言語 / フレームワーク: 未定
-- データ保存先: 未定
+- フロントエンド: React + Vite（`src/`）、グラフは Chart.js（react-chartjs-2）
+- バックエンド: Node.js + Express（`server/`）。Claude API はここからのみ呼ぶ
+- Claude API: `@anthropic-ai/sdk`、モデルは `claude-haiku-4-5`（Haiku の最新版）。構造化出力（zod）で JSON を受け取る
+- データ保存先: ブラウザのローカルストレージ（`src/storage.js`、キー `kakeibo.receipts.v1`）
+- カテゴリ一覧: `shared/categories.js`（フロント・バック共通）。グラフの色はこの並び順で固定（`src/colors.js`）
+
+### 構成上の注意
+
+- APIキー（`ANTHROPIC_API_KEY`）は `.env` でのみ管理する。ブラウザ側のコードに APIキーや Claude API 呼び出しを置かない。
+- 画像はサーバーのメモリ上で扱い、保存しない。受け付ける形式は JPEG / PNG / WebP / GIF、5MB まで。
+- 商品合計と支払合計がずれる場合（外税など）は、サーバーで「消費税・調整」行を追加して合計を合わせている。
 
 ## 開発コマンド
 
-<!-- セットアップ・起動・テスト・Lint のコマンドが決まったら追記してください -->
-- セットアップ: 未定
-- 開発サーバー起動: 未定
-- テスト: 未定
-- Lint / フォーマット: 未定
+- セットアップ: `npm install` → `.env.example` を `.env` にコピーして `ANTHROPIC_API_KEY` を設定
+- 開発サーバー起動: `npm run dev`（フロント http://localhost:5173 、バックエンド http://localhost:3001 。`/api` は Vite がバックエンドへ転送）
+- ビルド: `npm run build`（`dist/` に出力）
+- 本番起動: `npm start`（Express がビルド済みの `dist/` も配信）
+- テスト / Lint: 未導入。変更後は最低限 `npm run build` が通ることを確認する
 
 ## コーディング規約
 
